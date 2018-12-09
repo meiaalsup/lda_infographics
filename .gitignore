@@ -1,1 +1,6 @@
 raw_ocr_output.pickle
+google_text_extraction_output.pckl
+filtered.json
+.DS_Store
+images
+.ipynb_checkpoints
