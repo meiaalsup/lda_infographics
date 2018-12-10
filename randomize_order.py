@@ -31,7 +31,7 @@ urls = {}
 for person_id, person_row in enumerate(time_exposures):
     person_urls = []
     for i, exposure in enumerate(person_row):
-        person_urls.append(f'?im_id={i}&n_s={exposure}&subj_id={person_id}&tag=valid')
+        person_urls.append(f'http://cocosci-study.herokuapp.com/?im_id={i}&n_s={exposure}&subj_id={person_id}&tag=valid')
     shuffle(person_urls)
     urls[person_id] = person_urls
 
