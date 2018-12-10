@@ -1,30 +1,41 @@
 import numpy as np
+from random import shuffle
+import json
 
-
-
+t0 = 1
+t1 = 5
+t2 = 25
 
 time_exposures = np.array([
-    [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
-    [0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0],
-    [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0, 0],
-    [0, 1, 1, 1, 1, 2, 2, 2, 2, 0, 0, 0],
-    [1, 1, 1, 1, 2, 2, 2, 2, 0, 0, 0, 0],
+    [t0, t0, t0, t0, t1, t1, t1, t1, t2, t2, t2, t2],
+    [t0, t0, t0, t1, t1, t1, t1, t2, t2, t2, t2, t0],
+    [t0, t0, t1, t1, t1, t1, t2, t2, t2, t2, t0, t0],
+    [t0, t1, t1, t1, t1, t2, t2, t2, t2, t0, t0, t0],
+    [t1, t1, t1, t1, t2, t2, t2, t2, t0, t0, t0, t0],
 
-    [1, 1, 1, 2, 2, 2, 2, 0, 0, 0, 0, 1],
-    [1, 1, 2, 2, 2, 2, 0, 0, 0, 0, 1, 1],
-    [1, 2, 2, 2, 2, 0, 0, 0, 0, 1, 1, 1],
-    [2, 2, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1],
-    [2, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2],
+    [t1, t1, t1, t2, t2, t2, t2, t0, t0, t0, t0, t1],
+    [t1, t1, t2, t2, t2, t2, t0, t0, t0, t0, t1, t1],
+    [t1, t2, t2, t2, t2, t0, t0, t0, t0, t1, t1, t1],
+    [t2, t2, t2, t2, t0, t0, t0, t0, t1, t1, t1, t1],
+    [t2, t2, t2, t0, t0, t0, t0, t1, t1, t1, t1, t2],
 
-    [2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2],
-    [2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2],
+    [t2, t2, t0, t0, t0, t0, t1, t1, t1, t1, t2, t2],
+    [t2, t0, t0, t0, t0, t1, t1, t1, t1, t2, t2, t2],
 
-    [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2],
-    [1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0],
-    [2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1],
+    [t0, t1, t2, t0, t1, t2, t0, t1, t2, t0, t1, t2],
+    [t1, t2, t0, t1, t2, t0, t1, t2, t0, t1, t2, t0],
+    [t2, t0, t1, t2, t0, t1, t2, t0, t1, t2, t0, t1],
 ])
-print(np.sum(time_exposures, axis=0))
-print(np.sum(time_exposures, axis=1))
+
+urls = {}
+for person_id, person_row in enumerate(time_exposures):
+    person_urls = []
+    for i, exposure in enumerate(person_row):
+        person_urls.append(f'?im_id={i}&n_s={exposure}&subj_id={person_id}&tag=valid')
+    shuffle(person_urls)
+    urls[person_id] = person_urls
+
+json.dump(urls, open('urls.json', 'w'))
 
 '''
 result:
