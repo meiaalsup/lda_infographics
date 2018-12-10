@@ -11,3 +11,6 @@ LDA applied to Infographics - Final Project for 6.804
 ## Variables to control for:
 dimensions and orientation
 
+## User study 
+User study is located in another repo for ease of deploying. Find it here: https://github.com/a-newman/cocosci-study
+
