@@ -27,20 +27,13 @@ time_exposures = np.array([
     [t2, t0, t1, t2, t0, t1, t2, t0, t1, t2, t0, t1],
 ])
 
-urls = []
+urls = {}
 for person_id, person_row in enumerate(time_exposures):
     person_urls = []
     for i, exposure in enumerate(person_row):
         person_urls.append(f'?im_id={i}&n_s={exposure}&subj_id={person_id}&tag=valid')
     shuffle(person_urls)
-    urls.append(person_urls)
-
-print(len(urls))
-print(len(urls[0]))
-print(urls[0])
-print('\n')
-print(urls)
-
+    urls[person_id] = person_urls
 
 json.dump(urls, open('urls.json', 'w'))
 
