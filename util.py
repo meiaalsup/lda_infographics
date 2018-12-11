@@ -55,9 +55,12 @@ class Distribution(dict):
 
     def renormalize(self):
         normalization_constant = sum(self.values())
-        assert normalization_constant > 0, "Probabilities shouldn't all be 0"
-        for key in self.keys():
-            self[key] /= normalization_constant
+        if normalization_constant == 0:
+            for key in self.keys():
+                self[key] = 1.0/(len(self.keys()))
+        else:
+            for key in self.keys():
+                self[key] /= normalization_constant
 
     def get_mode(self):
         maximum = -1
