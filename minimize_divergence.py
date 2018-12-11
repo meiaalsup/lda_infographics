@@ -45,6 +45,11 @@ def divergence(text, image, human, alpha):
         div -= human[cat] * np.log(text[cat]*alpha+image[cat]*(1-alpha))
     return div
 
+#def average_divergence(text, image, human, alpha):
+#    for id_ in range(NUM_IMAGES):
+
+
+
 
 ###################################################################################################
 # Get the distributions
@@ -55,6 +60,7 @@ def get_human(num_seconds):
     relevant = [entry for entry in data
                 if entry['n_seconds'] == num_seconds and entry['tag'] == 'valid']
     
+
     humans = {image_id: make_dist({}) for image_id in range(NUM_IMAGES)}
     for entry in relevant:
         id_ = int(entry['im_id'])
@@ -74,6 +80,7 @@ def get_text():
     for image, input_dist in data.items(): 
         dist = make_dist({int(category_id): float(p) for category_id, p in input_dist.items()})  
         dists[int(image)] = dist
+    print(dists)
     return dists
 
     
