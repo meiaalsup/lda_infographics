@@ -56,11 +56,11 @@ class Distribution(dict):
     def renormalize(self):
         normalization_constant = sum(self.values())
         if normalization_constant == 0:
-            print("Probabilities all zero so returning the uniform distribution")
             for key in self.keys():
                 self[key] = 1.0/(len(self.keys()))
-        for key in self.keys():
-            self[key] /= normalization_constant
+        else:
+            for key in self.keys():
+                self[key] /= normalization_constant
 
     def get_mode(self):
         maximum = -1

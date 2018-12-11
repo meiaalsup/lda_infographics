@@ -4,4 +4,4 @@ filtered.json
 .DS_Store
 images
 .ipynb_checkpoints
-__pycache__
+__pycache__/

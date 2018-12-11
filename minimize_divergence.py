@@ -2,6 +2,7 @@ import json
 
 import scipy
 import matplotlib.pyplot as plt
+import numpy as np
 
 from util import Distribution as Dist
 
@@ -22,6 +23,10 @@ def make_dist(dist):
     return start
 
 
+###################################################################################################
+# Divergence calculation
+###################################################################################################
+
 def get_alpha(text, image, human):
     # D(human | image + text)
     def fun(a):
@@ -34,20 +39,33 @@ def get_alpha(text, image, human):
 def divergence(text, image, human, alpha):
     # Calculates divergence between the distributions for a given image
     div = 0
+    print(human)
     for cat in categories:
-        div += human[cat]*np.log(human[cat])
-        div -= human[cat]*np.log(text[cat]*alpha+image[cat]*(1-alpha))
+        div += human[cat] * np.log(human[cat])
+        div -= human[cat] * np.log(text[cat]*alpha+image[cat]*(1-alpha))
     return div
 
+
+###################################################################################################
+# Get the distributions
+###################################################################################################
 
 def get_human(num_seconds):
     data = json.load(open(HUMAN_PATH))
     relevant = [entry for entry in data
                 if entry['n_seconds'] == num_seconds and entry['tag'] == 'valid']
     
-
-    dist.renormalize()
-    return dist
+    humans = {image_id: make_dist({}) for image_id in range(NUM_IMAGES)}
+    for entry in relevant:
+        id_ = int(entry['im_id'])
+        for category, weight in entry['answers'].items():
+            p = 0
+            if len(weight) > 0:
+                p = int(weight)
+            humans[id_][int(category)] += p
+    for im, dist in humans.items():
+        dist.renormalize()
+    return humans
 
 
 def get_text():
@@ -56,25 +74,30 @@ def get_text():
     for image, input_dist in data.items(): 
         dist = make_dist({int(category_id): float(p) for category_id, p in input_dist.items()})  
         dists[int(image)] = dist
-    print(dists)
     return dists
 
     
 def get_image():
-    data = json.load(open(IMAGE_PATH))
-    dist = Dist()  
-    dist.renormalize()
-    return dist
+    return {image_id: make_dist({}) for image_id in range(NUM_IMAGES)}
 
 
 
-categories = json.load(open(CATEGORIES_PATH))
+categories_edited = json.load(open(CATEGORIES_PATH))
+categories = {int(cat):val for cat, val in categories_edited.items()}
+print(categories)
 
 text_dist = get_text()
-#image_dist = get_image()
+image_dist = get_image()
 
 #alphas = {time: get_alpha(text_dist, image_dist, get_human(time)) for time in INTERVALS}
 
+alpha_values = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+alphas = {time: [divergence(text_dist, image_dist, get_human(time), alpha)
+                 for alpha in alpha_values]
+          for time in INTERVALS}
+
+plt.plot(alpha_values, alphas[1])
+plt.plot(alpha_values, alphas[5])
+plt.plot(alpha_values, alphas[25])
 #plt.scatter(alphas.keys(), alphas.values())
 
-print(make_dist({}))
