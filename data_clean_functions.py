@@ -173,6 +173,8 @@ def download_data(bucket_name, saveto=""):
             bucket.download_fileobj(key, tmpfile)
         with open(temp_filename, 'r') as tmpfile: 
             data[key] = json.load(tmpfile)
+        # get the timestamp
+        data[key]["timestamp"] = S3.Object(bucket_name, key).last_modified
     os.remove(temp_filename)
     if (saveto): 
         with open(saveto, 'w') as outfile: 
