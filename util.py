@@ -82,7 +82,3 @@ class Distribution(dict):
 
         rand_idx = np.where(np.random.multinomial(1, probs))[0][0]
         return keys[rand_idx]
-
-
-
-
