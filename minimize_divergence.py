@@ -74,9 +74,10 @@ def get_human(num_seconds):
     for entry in relevant:
         id_ = int(entry['im_id'])
         for category, weight in entry['answers'].items():
+            total = sum(entry['amswers'].values())
             p = 0
             if len(weight) > 0:
-                p = int(weight)
+                p = int(weight)/total*10
             humans[id_][int(category)] += p
     for im, dist in humans.items():
         humans[im] = Dist(dist)

@@ -31,12 +31,12 @@ urls = {}
 for person_id, person_row in enumerate(time_exposures):
     person_urls = []
     for i, exposure in enumerate(person_row):
-        person_urls.append(f'http://cocosci-study.herokuapp.com/?im_id={i}&n_s={exposure}&subj_id={person_id+16}&tag=valid')
+        person_urls.append(f'http://cocosci-study.herokuapp.com/?im_id={i}&n_s={exposure}&subj_id={person_id+16+15+15+15}&tag=valid')
     shuffle(person_urls)
     urls[person_id] = person_urls
 
 print(urls)
-json.dump(urls, open('urls.json', 'w'))
+json.dump(urls, open('urls_round5.json', 'w'))
 
 '''
 result:
