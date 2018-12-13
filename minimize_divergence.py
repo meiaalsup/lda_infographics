@@ -49,8 +49,8 @@ def divergence(text, image, human, alpha):
     for cat in categories:
         x.append(pred[cat])
         y.append(human[cat])
-    ent = entropy(y,x, base=2)
-    return np.sum(ent)
+    return entropy(y,x, base=2)
+    #return np.sum(ent)
 
 def mse(text, image, human, alpha):
     pred = {cat: alpha*text[cat] + (1-alpha)*image[cat] for cat in categories}
@@ -69,24 +69,23 @@ def get_human(num_seconds):
     data = json.load(open(HUMAN_PATH))
     relevant = [entry for entry in data
                 if entry['n_seconds'] == num_seconds and entry['tag'] == 'valid']
+    counts = {image_id: 0 for image_id in range(NUM_IMAGES)}
     
     humans = {image_id: {int(cat):0 for cat in categories} for image_id in range(NUM_IMAGES)}
     for entry in relevant:
         id_ = int(entry['im_id'])
         total = sum([float(x) for x in entry['answers'].values() if len(x)>0 and len(x)<=2])
-        try:
-            if total > 0:
-                for category, weight in entry['answers'].items():
-                    p = 0
-                    if len(weight) > 0:
-                        p = float(weight)/total*10
-                    humans[id_][int(category)] += p
-        except ValueError:
-            print(entry['answers'].values())
-            continue
+        if total > 0:
+            counts[id_] +=1
+            for category, weight in entry['answers'].items():
+                p = 0
+                if len(weight) > 0:
+                    p = float(weight)/total*10
+                humans[id_][int(category)] += p
     for im, dist in humans.items():
         humans[im] = Dist(dist)
         humans[im].renormalize()
+    print(f'for {num_seconds} seconds we have the following counts: {counts}')
     return humans
 
 
@@ -168,22 +167,22 @@ for im in range(NUM_IMAGES):
     plt.close()
 
     plt.title(f'MSE for image number {im} url: {id_to_url[str(im)]}')
-    plt.plot(alpha_values, alphas_i_mse[im][1], label='1', color='blue')
-    plt.plot(alpha_values, alphas_i_mse[im][5], label='5', color='red')
-    plt.plot(alpha_values, alphas_i_mse[im][25], label='25', color='pink')
+    plt.plot(alpha_values, alphas_i_mse[im][1], label='1', color='red')
+    plt.plot(alpha_values, alphas_i_mse[im][5], label='5', color='green')
+    plt.plot(alpha_values, alphas_i_mse[im][25], label='25', color='blue')
     plt.legend()
     plt.plot()
     plt.savefig(f'results/mse_im{im}.png')
     plt.close()
 
-    plt.title(f'Divergence for image number {im} url: {id_to_url[str(im)]}')
-    plt.plot(alpha_values, alphas_i_div[im][1], label='1', color='blue')
-    plt.plot(alpha_values, alphas_i_div[im][5], label='5', color='red')
-    plt.plot(alpha_values, alphas_i_div[im][25], label='25', color='pink')
-    plt.legend()
-    plt.plot()
-    plt.savefig(f'results/divergence_im{im}.png')
-    plt.close()
+    # plt.title(f'Divergence for image number {im} url: {id_to_url[str(im)]}')
+    # plt.plot(alpha_values, alphas_i_div[im][1], label='1', color='blue')
+    # plt.plot(alpha_values, alphas_i_div[im][5], label='5', color='red')
+    # plt.plot(alpha_values, alphas_i_div[im][25], label='25', color='pink')
+    # plt.legend()
+    # plt.plot()
+    # plt.savefig(f'results/divergence_im{im}.png')
+    # plt.close()
     
 
 # opt_alphas_div = {time: get_alpha(text_dist, image_dist, human[time], divergence).x
@@ -194,8 +193,8 @@ colors = ['red', 'green', 'orange', 'blue', 'gray', 'purple']
 for j, i in enumerate(INTERVALS):
     # print(f'{opt_alphas_div[i]} is optimal for {i} seconds with divergence loss')
     print(f'{opt_alphas_mse[i]} is optimal for {i} seconds with mse loss')
-    plt.plot(alpha_values, alphas_div[i], label='1 div', color=colors[j])
-    plt.plot(alpha_values, alphas_mse[i], label='1 mse', color=colors[-j-1])
+    plt.plot(alpha_values, alphas_div[i], label=f'{i} div', color=colors[j])
+    plt.plot(alpha_values, alphas_mse[i], label=f'{i} mse', color=colors[-j-1])
 plt.legend()
 plt.plot()
 plt.savefig(f'results/loss_all_images_averaged.png')
