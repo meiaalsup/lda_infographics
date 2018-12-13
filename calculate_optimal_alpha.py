@@ -217,3 +217,14 @@ plt.plot()
 plt.savefig(f'results/loss_all_images_averaged.png')
 plt.close()
 
+
+width =.5
+plt.bar([g for g in grid_number], text_dist[2].values(), width, color=colors[3])
+plt.title(f'PDF of text distribution for image 2')
+plt.xticks(grid_number, [categories[i] for i in grid_number], rotation='vertical')
+plt.xlabel(f'categories')
+plt.ylabel(f'probability')
+plt.tight_layout()
+plt.plot()
+plt.savefig(f'sample_text_distribution.png')
+
