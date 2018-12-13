@@ -100,14 +100,18 @@ def get_text():
     
 def get_image():
     content = open(IMAGE_PATH).readlines()
-    images = {image_id: {int(cat):0 for cat in categories} for image_id in range(NUM_IMAGES)}
+    images = {image_id: {int(cat):0 for cat in info_to_cats[str(image_id)]} for image_id in range(NUM_IMAGES)}
     for line in content:
         stuff = line.split()
         if len(stuff) >=5:
             id_ = url_to_id[stuff[0]]
-            images[id_][int(stuff[2])]+= 5
-            images[id_][int(stuff[3])]+= 0
-            images[id_][int(stuff[4])]+= 0
+            cat1, cat2, cat3 = int(stuff[2]), int(stuff[3]), int(stuff[4])
+            if cat1 in images[id_]:
+                images[id_][cat1]+= 5
+            if cat2 in images[id_]:
+                images[id_][cat2]+= 2
+            if cat3 in images[id_]:
+                images[id_][cat3]+= 0
     for im, dist in images.items():
         images[im] = Dist(dist)
         images[im].renormalize()
@@ -121,6 +125,7 @@ url_to_id = json.load(open('infographic_url_to_id_map.json'))
 id_to_url = json.load(open('infographic_id_to_url_map.json'))
 categories_edited = json.load(open(CATEGORIES_PATH))
 categories = {int(cat):val for cat, val in categories_edited.items()}
+info_to_cats = json.load(open('info_to_cats_dict.json'))
 
 text_dist = get_text()
 image_dist = get_image()
@@ -150,18 +155,20 @@ alphas_i_mse = {i: {time: [loss(text_dist, image_dist, human[time], alpha, [i], 
 
 grid_number = [i for i in categories.keys()]
 width = .2
+colors = ['red', 'green', 'blue', 'orange', 'gray', 'purple']
 for im in range(NUM_IMAGES):
     w = 0
     for time, im_dist in human.items():
         #for im, dist_ in im_dist.items():
         dist_ = im_dist[im]
-        plt.bar([g+w*width for g in grid_number], dist_.values(), width, label=f'human for # {im} for {time} seconds')
+        plt.bar([g+w*width for g in grid_number], dist_.values(), width, color=colors[w], label=f'human for # {im} for {time} seconds')
         w+=1
     plt.title(f'image number {im} url: {id_to_url[str(im)]}')
     plt.xticks(grid_number, [categories[i] for i in grid_number], rotation='vertical')
-    plt.bar([g+4*width for g in grid_number], image_dist[im].values(), width, label=f'image for # {im}')
-    plt.bar([g+3*width for g in grid_number], text_dist[im].values(), width, label=f'text for # {im}')
+    plt.bar([g+4*width for g in grid_number], image_dist[im].values(), width, color=colors[3], label=f'image for # {im}')
+    plt.bar([g+3*width for g in grid_number], text_dist[im].values(), width, color=colors[4], label=f'text for # {im}')
     plt.legend()
+    plt.tight_layout()
     plt.plot()
     plt.savefig(f'results/distribution_im{im}.png')
     plt.close()
@@ -190,13 +197,12 @@ for im in range(NUM_IMAGES):
 #                   for time in INTERVALS}
 opt_alphas_mse = {time: get_alpha(text_dist, image_dist, human[time], mse).x
                   for time in INTERVALS}
-colors = ['red', 'green', 'orange', 'blue', 'gray', 'purple']
 for j, i in enumerate(INTERVALS):
     # print(f'{opt_alphas_div[i]} is optimal for {i} seconds with divergence loss')
     print(f'{opt_alphas_mse[i]} is optimal for {i} seconds with mse loss')
     print(f'mse: {loss(text_dist, image_dist, human[i], opt_alphas_mse[i], list(range(NUM_IMAGES)), mse)}')
-    plt.plot(alpha_values, alphas_div[i], label=f'{i} div', color=colors[j])
-    plt.plot(alpha_values, alphas_mse[i], label=f'{i} mse', color=colors[-j-1])
+    #plt.plot(alpha_values, alphas_div[i], label=f'{i} div', color=colors[-j-1])
+    plt.plot(alpha_values, alphas_mse[i], label=f'{i} mse', color=colors[j])
 plt.legend()
 plt.plot()
 plt.savefig(f'results/loss_all_images_averaged.png')
