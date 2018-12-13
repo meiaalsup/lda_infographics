@@ -107,9 +107,9 @@ def get_image():
             id_ = url_to_id[stuff[0]]
             cat1, cat2, cat3 = int(stuff[2]), int(stuff[3]), int(stuff[4])
             if cat1 in images[id_]:
-                images[id_][cat1]+= 5
+                images[id_][cat1]+= 2
             if cat2 in images[id_]:
-                images[id_][cat2]+= 2
+                images[id_][cat2]+= 1
             if cat3 in images[id_]:
                 images[id_][cat3]+= 0
     for im, dist in images.items():
@@ -161,23 +161,31 @@ for im in range(NUM_IMAGES):
     for time, im_dist in human.items():
         #for im, dist_ in im_dist.items():
         dist_ = im_dist[im]
-        plt.bar([g+w*width for g in grid_number], dist_.values(), width, color=colors[w], label=f'human for # {im} for {time} seconds')
+        plt.bar([g+w*width for g in grid_number], dist_.values(), width, color=colors[w],
+                label=f'human for {time} seconds')
         w+=1
-    plt.title(f'image number {im} url: {id_to_url[str(im)]}')
+    plt.title(f'PDF of distributions for image number {im}')
     plt.xticks(grid_number, [categories[i] for i in grid_number], rotation='vertical')
-    plt.bar([g+4*width for g in grid_number], image_dist[im].values(), width, color=colors[3], label=f'image for # {im}')
-    plt.bar([g+3*width for g in grid_number], text_dist[im].values(), width, color=colors[4], label=f'text for # {im}')
+    plt.bar([g+4*width for g in grid_number], image_dist[im].values(), width, color=colors[3],
+            label=f'image')
+    plt.bar([g+3*width for g in grid_number], text_dist[im].values(), width, color=colors[4],
+            label=f'text from LDA')
     plt.legend()
     plt.tight_layout()
+    plt.xlabel(f'categories')
+    plt.ylabel(f'probability')
     plt.plot()
     plt.savefig(f'results/distribution_im{im}.png')
     plt.close()
 
-    plt.title(f'MSE for image number {im} url: {id_to_url[str(im)]}')
-    plt.plot(alpha_values, alphas_i_mse[im][1], label='1', color='red')
-    plt.plot(alpha_values, alphas_i_mse[im][5], label='5', color='green')
-    plt.plot(alpha_values, alphas_i_mse[im][25], label='25', color='blue')
-    plt.ylim(0, .05)
+    plt.title(f'MSE for image number {im}')
+    plt.plot(alpha_values, alphas_i_mse[im][1], label='1 sec of human exposure', color='red')
+    plt.plot(alpha_values, alphas_i_mse[im][5], label='5 sec of human exposure', color='green')
+    plt.plot(alpha_values, alphas_i_mse[im][25], label='25 sec of human exposure', color='blue')
+    plt.ylim(0, .04)
+    plt.xlabel(f'alpha - proportion of text')
+    plt.ylabel(f'Mean Squared Error')
+    plt.tight_layout()
     plt.legend()
     plt.plot()
     plt.savefig(f'results/mse_im{im}.png')
@@ -202,7 +210,10 @@ for j, i in enumerate(INTERVALS):
     print(f'{opt_alphas_mse[i]} is optimal for {i} seconds with mse loss')
     print(f'mse: {loss(text_dist, image_dist, human[i], opt_alphas_mse[i], list(range(NUM_IMAGES)), mse)}')
     #plt.plot(alpha_values, alphas_div[i], label=f'{i} div', color=colors[-j-1])
-    plt.plot(alpha_values, alphas_mse[i], label=f'{i} mse', color=colors[j])
+    plt.plot(alpha_values, alphas_mse[i], label=f'{i} sec of human exposure', color=colors[j])
+plt.title('Average Mean Squared Error across all 12 Images')
+plt.xlabel(f'alpha value (proportion that is text)')
+plt.ylabel(f'Mean Squared Error')
 plt.legend()
 plt.plot()
 plt.savefig(f'results/loss_all_images_averaged.png')
