@@ -106,8 +106,8 @@ def get_image():
         if len(stuff) >=5:
             id_ = url_to_id[stuff[0]]
             images[id_][int(stuff[2])]+= 5
-            images[id_][int(stuff[3])]+= 4
-            images[id_][int(stuff[4])]+= 1
+            images[id_][int(stuff[3])]+= 0
+            images[id_][int(stuff[4])]+= 0
     for im, dist in images.items():
         images[im] = Dist(dist)
         images[im].renormalize()
@@ -170,6 +170,7 @@ for im in range(NUM_IMAGES):
     plt.plot(alpha_values, alphas_i_mse[im][1], label='1', color='red')
     plt.plot(alpha_values, alphas_i_mse[im][5], label='5', color='green')
     plt.plot(alpha_values, alphas_i_mse[im][25], label='25', color='blue')
+    plt.ylim(0, .05)
     plt.legend()
     plt.plot()
     plt.savefig(f'results/mse_im{im}.png')
@@ -193,6 +194,7 @@ colors = ['red', 'green', 'orange', 'blue', 'gray', 'purple']
 for j, i in enumerate(INTERVALS):
     # print(f'{opt_alphas_div[i]} is optimal for {i} seconds with divergence loss')
     print(f'{opt_alphas_mse[i]} is optimal for {i} seconds with mse loss')
+    print(f'mse: {loss(text_dist, image_dist, human[i], opt_alphas_mse[i], list(range(NUM_IMAGES)), mse)}')
     plt.plot(alpha_values, alphas_div[i], label=f'{i} div', color=colors[j])
     plt.plot(alpha_values, alphas_mse[i], label=f'{i} mse', color=colors[-j-1])
 plt.legend()
