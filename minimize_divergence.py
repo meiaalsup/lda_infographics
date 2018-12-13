@@ -73,11 +73,17 @@ def get_human(num_seconds):
     humans = {image_id: {int(cat):0 for cat in categories} for image_id in range(NUM_IMAGES)}
     for entry in relevant:
         id_ = int(entry['im_id'])
-        for category, weight in entry['answers'].items():
-            p = 0
-            if len(weight) > 0:
-                p = int(weight)
-            humans[id_][int(category)] += p
+        total = sum([float(x) for x in entry['answers'].values() if len(x)>0 and len(x)<=2])
+        try:
+            if total > 0:
+                for category, weight in entry['answers'].items():
+                    p = 0
+                    if len(weight) > 0:
+                        p = float(weight)/total*10
+                    humans[id_][int(category)] += p
+        except ValueError:
+            print(entry['answers'].values())
+            continue
     for im, dist in humans.items():
         humans[im] = Dist(dist)
         humans[im].renormalize()
