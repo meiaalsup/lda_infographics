@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import json
-import scipy
+
 from sklearn.metrics import mean_squared_error
 from scipy.stats import entropy
+import scipy
 
 from util import Distribution as Dist
 
@@ -61,9 +62,9 @@ def mse(text, image, human, alpha):
     return mean_squared_error(x, y)
 
 
-###################################################################################################
+##################################################################################################
 # Get the distributions
-###################################################################################################
+##################################################################################################
 
 def get_human(num_seconds):
     data = json.load(open(HUMAN_PATH))
@@ -100,7 +101,8 @@ def get_text():
     
 def get_image():
     content = open(IMAGE_PATH).readlines()
-    images = {image_id: {int(cat):0 for cat in info_to_cats[str(image_id)]} for image_id in range(NUM_IMAGES)}
+    images = {image_id: {int(cat):0 for cat in info_to_cats[str(image_id)]}
+              for image_id in range(NUM_IMAGES)}
     for line in content:
         stuff = line.split()
         if len(stuff) >=5:
@@ -119,8 +121,10 @@ def get_image():
         images[im].renormalize()
     return images
 
+###################################################################################################
+# Problem Setup: Loading the relevant information
+###################################################################################################
 
-##### PROBLEM SETUP
 url_to_id = json.load(open('infographic_url_to_id_map.json'))
 id_to_url = json.load(open('infographic_id_to_url_map.json'))
 categories_edited = json.load(open(CATEGORIES_PATH))
@@ -131,6 +135,8 @@ text_dist = get_text()
 image_dist = get_image()
 human = {time: get_human(time) for time in INTERVALS}
 
+##################################################################################################
+# Execute calculations and optimizations
 ##################################################################################################
 
 alpha_values = [x*.1 for x in range(11)]
@@ -152,6 +158,12 @@ alphas_i_mse = {i: {time: [loss(text_dist, image_dist, human[time], alpha, [i], 
                            for alpha in alpha_values]
                     for time in INTERVALS}
                 for i in range(NUM_IMAGES)}
+
+
+
+##################################################################################################
+# Plot results
+##################################################################################################
 
 grid_number = [i for i in categories.keys()]
 width = .2
@@ -191,25 +203,11 @@ for im in range(NUM_IMAGES):
     plt.savefig(f'results/mse_im{im}.png')
     plt.close()
 
-    # plt.title(f'Divergence for image number {im} url: {id_to_url[str(im)]}')
-    # plt.plot(alpha_values, alphas_i_div[im][1], label='1', color='blue')
-    # plt.plot(alpha_values, alphas_i_div[im][5], label='5', color='red')
-    # plt.plot(alpha_values, alphas_i_div[im][25], label='25', color='pink')
-    # plt.legend()
-    # plt.plot()
-    # plt.savefig(f'results/divergence_im{im}.png')
-    # plt.close()
-    
-
-# opt_alphas_div = {time: get_alpha(text_dist, image_dist, human[time], divergence).x
-#                   for time in INTERVALS}
 opt_alphas_mse = {time: get_alpha(text_dist, image_dist, human[time], mse).x
                   for time in INTERVALS}
 for j, i in enumerate(INTERVALS):
-    # print(f'{opt_alphas_div[i]} is optimal for {i} seconds with divergence loss')
     print(f'{opt_alphas_mse[i]} is optimal for {i} seconds with mse loss')
     print(f'mse: {loss(text_dist, image_dist, human[i], opt_alphas_mse[i], list(range(NUM_IMAGES)), mse)}')
-    #plt.plot(alpha_values, alphas_div[i], label=f'{i} div', color=colors[-j-1])
     plt.plot(alpha_values, alphas_mse[i], label=f'{i} sec of human exposure', color=colors[j])
 plt.title('Average Mean Squared Error across all 12 Images')
 plt.xlabel(f'alpha value (proportion that is text)')
