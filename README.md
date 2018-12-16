@@ -10,13 +10,14 @@ User study is located in [another repo](https://github.com/a-newman/cocosci-stud
 ## Model fitting
 Alpha Optimization [code here](https://github.com/meiaalsup/lda_infographics/blob/master/calculate_optimal_alpha.py)
 
+## Icon vectorization and clustering
+Code for generating feature vectors for icons using a ResNet and clustering using k-means can be found [here](https://github.mit.edu/apnewman/icon-fine-tune/).
 
 ## Data set
-Notes about improvements/confusions/comments about the data set and its use:- Some of the images in the dataset of scraped icons from Google do not work (cause errors when trying to load using pytorch's ImageFolder loader). TODO: make a list of thsese problem images 
+Notes about improvements/confusions/comments about the Visual.ly dataset and the accompannying tutorials (this feedback will be passed along to the creator of the data set): 
+- Some of the images in the dataset of scraped icons from Google do not work (cause errors when trying to load using pytorch's ImageFolder loader).  
 - It was unclear to me where to find the links for some of the data files (those in `links_to_data_files.md`. Maybe there should be a brief description in the README of all data files, what they contain, their size, where they are located, etc. 
 - I was confused between some of the data files. For instance, for some infographics, there are computer-generated icon proposals as well as human-labeled icons and originally I used the wrong data inadvertently. See above comment about an index of data files.
-
-
 
 ## Analysis
 image 0: All the predictions and distributions line up very well. It is unclear if this is
